@@ -11,7 +11,7 @@ module Proxy
         end
 
         def correct_repo_info(repo_info)
-          %w[vcs_url name ref].all? { |param| repo_info.key?(param) }
+          %w[vcs_url role_name ref].all? { |param| repo_info.key?(param) }
         end
 
         def role_exists(role_name)
@@ -19,14 +19,14 @@ module Proxy
         end
 
         def install_role(repo_info)
-          git = Git.init(repo_path(repo_info['name']))
+          git = Git.init(repo_path(repo_info['role_name']))
           git.add_remote('origin', repo_info['vcs_url'])
           git.fetch
           git.checkout(repo_info['ref'])
         end
 
         def update_role(repo_info)
-          git = Git.open(repo_path(repo_info['name']))
+          git = Git.open(repo_path(repo_info['role_name']))
           git.remove_remote('origin')
           git.add_remote('origin', repo_info['vcs_url'])
           git.fetch

@@ -34,20 +34,20 @@ module Proxy
         end
 
         # Clones a new role from the provided information.
-        # Requires hash with keys "vcs_url", "name" and "ref"
+        # Requires hash with keys "vcs_url", "role_name" and "ref"
         # Returns 201 if a role was created
         # Returns 400 if a parameter is unfulfilled or invalid repo-info was provided
         # Returns 409 if a role with "name" already exists
         def install(repo_info)
           return Response.new(400, 'Check parameters') unless VcsClonerHelper.correct_repo_info(repo_info)
 
-          if VcsClonerHelper.role_exists repo_info['name']
+          if VcsClonerHelper.role_exists repo_info['role_name']
             return Response.new(409,
-                                "Role \"#{repo_info['name']}\" already exists.")
+                                "Role \"#{repo_info['role_name']}\" already exists.")
           end
 
           begin VcsClonerHelper.install_role repo_info
-                Response.new(201, "Role \"#{repo_info['name']}\" has been created.")
+                Response.new(201, "Role \"#{repo_info['role_name']}\" has been created.")
           rescue Git::GitExecuteError => e
             Response.new(400, "Git Error: #{e}")
           end
@@ -55,7 +55,7 @@ module Proxy
 
         # Updates a role with the provided information.
         # Installs a role if it does not yet exist
-        # Requires hash with keys "vcs_url", "name" and "ref"
+        # Requires hash with keys "vcs_url", "role_name" and "ref"
         # Returns 200 if a role was updated
         # Returns 201 if a role was created
         # Returns 400 if a parameter is unfulfilled or invalid repo-info was provided
@@ -63,12 +63,12 @@ module Proxy
           return Response.new(400, 'Check parameters') unless VcsClonerHelper.correct_repo_info repo_info
 
           begin
-            if VcsClonerHelper.role_exists repo_info['name']
+            if VcsClonerHelper.role_exists repo_info['role_name']
               VcsClonerHelper.update_role repo_info
-              Response.new(200, "Role \"#{repo_info['name']}\" has been updated.")
+              Response.new(200, "Role \"#{repo_info['role_name']}\" has been updated.")
             else
               VcsClonerHelper.install_role repo_info
-              Response.new(201, "Role \"#{repo_info['name']}\" has been created.")
+              Response.new(201, "Role \"#{repo_info['role_name']}\" has been created.")
             end
           rescue Git::GitExecuteError => e
             Response.new(400, "Git Error: #{e}")
